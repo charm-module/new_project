@@ -1,0 +1,228 @@
+{% extends "adminpanel/base.html" %}
+
+{%block content%}
+<style>
+  hr {
+margin-top: 1rem;
+margin-bottom: 1rem;
+border: 0;
+border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<section class="content">
+  <div class="container-fluid" style="margin-top: 10px;">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+
+            <h3 class="card-title">Orders</h3>
+            <div class="card-tools">
+              <div class="input-group input-group-sm" style="width: 150px;">
+                <form method="GET" action="/admin/admin_orders">
+                <select name="filter">
+                  <option value="">ALL</option>
+                  <option value="DELIVERED">DELIVERED</option>
+                  <option value="ACCEPTED">ACCEPTED</option>
+                  <option  value="PACKED">PACKED</option>
+                  <option  value="pending">Pending</option>
+                  <option value="CANCEL">CANCEL</option>
+                  <input type="submit" value="DONE">
+
+                  
+                </select>
+              </form>
+                <!-- drop down for filter -->
+              
+                <!-- Enddrop down for filter -->
+                <div class="input-group-append">
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap" id="order_table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Customer Name</th>
+                  <th>Customer Email</th>
+                  <th>Selling Price</th>
+                  <th>Discount Price</th>
+                  <th>Order status</th>
+
+                  <th>Action</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                <tr>
+                  <td>{{ order.product.title }}</td>
+                  <td>{{ order.Customer.name }}</td>
+                  <td>{{ order.User.email }}</td>
+
+                  <td>{{ order.product.selling_price }}</td>
+                  <td>{{ order.product.discount_price }}</td>
+                  <td>
+                    <select class="input-xlarge status">
+                      <option value="Pending" {% if order.status == "Pending" %} selected {% endif %}>PENDING</option>
+                      <option value="ACCEPTED" {% if order.status == "ACCEPTED" %} selected {% endif %}>ACCEPTED</option>
+                      <option value="PACKED" {% if order.status == "PACKED" %} selected {% endif %}>PACKED</option>
+                      <option value="DELIVERED" {% if order.status == "DELIVERED" %} selected {% endif %}>DELIVERED
+                      </option>
+                      <option value="CANCEL" {% if order.status == "CANCEL" %} selected {% endif %}>CANCEL</option>
+
+                    </select>
+                  </td>
+                  <td hidden>{{ order.Customer.locality }}</td>
+                  <td hidden>{{ order.Customer.city }}</td>
+                  <td hidden>{{ order.Customer.zipcode }}</td>
+                  <td hidden>{{ order.Customer.state }}</td>
+                  <td hidden>{{ order.feedback }}</td>
+                  <td hidden>{{ order.quantity }}</td>
+
+
+                  <td>
+                    <button type="button" data-id="{{ order.id }}" class="btn btn-info btn-sm submit_order">Submit</button>
+                    <button type="button" data-id="{{ order.id }}" class="btn btn-warning btn-sm view_order" data-toggle="modal" data-target="#myModal">View</button>
+                    <form action="{% url 'order_delete' order.id %}" method="POST" onsubmit="window.ondelete()" style="display: inline;" id="hi">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  </td>
+                  </form>
+                  </td>
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+
+
+  </div>
+  <!-- /.card -->
+
+
+  </div>
+</section>
+<!-- /.content -->
+<div class="modal" id="myModal" style="overflow-y:auto;" role="dialog">
+  <div class="modal-dialog">
+  
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Order View</h4>
+      </div>
+      <div class="modal-body">
+        <p id="product_name"></p>
+        <p id="quantity"></p>
+        <p id="customer_name"></p>
+        <p id="customer_email"></p>
+        <p id="selling_price"></p>
+        <p id="discount_price"></p>
+        <p id="order_status"></p>
+        <p id="locality"></p>
+        <p id="city"></p>
+        <p id="zipcode"></p>
+        <p id="state"></p>
+        <p id="feedback"></p>
+        <p></p>
+
+        <h3>Order Details</h3>
+
+      </div>
+      <div class="modal-body" id="order_div"></div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger close_btn btn-sm" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+{% block custom_js %}
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+
+<script type="text/Javascript">
+  window.ondelete= function(){
+    var isValid =confirm('Are you sure Do you Want To Delete ?');
+    if (!isValid){
+      event.preventDefault();
+    }
+  }
+
+  $(document).ready(
+    function(){
+      $('.submit_order').click(function(event){
+      event.stopImmediatePropagation();
+      id = $(this).data('id');
+      val = $(this).closest("tr").find("td:eq(5) option:selected").val();
+      console.log(id,val);
+      $.ajax({
+        type : 'GET',
+        url : '/admin/order_status_change',
+        dataType: 'json',
+        data : {id:id,val:val},
+        success : function(data){
+          console.log(data);
+        },
+        error : function(data){
+          console.log(data);
+        }
+      });
+    });
+    
+    $('.view_order').click(function(event){
+        id = $(this).data('id');
+        
+        $('#myModal').find('#product_name').text("Product Name: "+ $(this).closest("tr").find("td:eq(0)").text());
+        $('#myModal').find('#customer_name').text("Customer Name: "+$(this).closest("tr").find("td:eq(1)").text());
+        $('#myModal').find('#customer_email').text("Customer Email: "+$(this).closest("tr").find("td:eq(2)").text());
+        $('#myModal').find('#selling_price').text("Selling Price: "+$(this).closest("tr").find("td:eq(3)").text());
+        $('#myModal').find('#discount_price').text("Discount Price: "+$(this).closest("tr").find("td:eq(4)").text());
+        $('#myModal').find('#order_status').text("Order Status: "+$(this).closest("tr").find("td:eq(5) option:selected").text());
+        $('#myModal').find('#locality').text("Locality: "+$(this).closest("tr").find("td:eq(6)").text());
+        $('#myModal').find('#city').text("City: "+$(this).closest("tr").find("td:eq(7)").text());
+        $('#myModal').find('#zipcode').text("Zip: "+$(this).closest("tr").find("td:eq(8)").text());
+        $('#myModal').find('#state').text("State: "+$(this).closest("tr").find("td:eq(9)").text());
+        $('#myModal').find('#feedback').text("Feedback: "+$(this).closest("tr").find("td:eq(10)").text());
+        $('#myModal').find('#quantity').text("Quantity: "+ $(this).closest("tr").find("td:eq(11)").text());
+      // $('#product_name').text('');
+      event.stopImmediatePropagation();
+      $.ajax({
+        type : 'GET',
+        url: `/admin/order_details`,
+        data : {id:id},
+        dataType :'json',
+        success : function(data){
+          list_data = []
+          $(data.data).each(function(key,val){
+            html_data = `<p>${val[0]}</p><p>${val[1]}</p><hr/>`;
+            list_data.push(html_data);
+          })
+          $('#order_div').html(list_data);
+          $('#myModal').show();
+        }
+      })
+      
+    });
+
+    $('.close_btn').click(function(){
+      $('#myModal').hide();
+    })
+  });
+</script>
+{% endblock custom_js %}
+
+{% endblock %}

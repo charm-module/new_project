@@ -1,0 +1,60 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Buy Now{% endblock title %}
+{% block main-content %}
+
+<style>
+    hr {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<div class="container my-5">
+ <div class="row">
+ <h3>Welcome {{user.username}}</h3>
+  <div class="col-sm-2 border-end">
+   <ul class="list-unstyled">
+    <li class="d-grid"><a href="{% url 'orders' %}" class="btn btn-primary">Orders</a></li>
+   </ul>
+  </div>
+  <div class="col-sm-9 offset-sm-1">
+   <div class="row">
+       {% for order in orders %}
+       <a href="/order_details/{{ order.id }}/">
+       <div class="col-sm-6">
+           <hr/>
+           <p><b>Product :</b>{{ order.product.title }}</p>
+           <p><b>Quantity : </b>{{ order.quantity }}</p>
+           <p><b>Order Date:</b>{{ order.orderes_date }}</p>
+           <p><b>Order Status:</b>{{ order.status }}</p>
+          </a>
+           {% if order.status == "DELIVERED" %}
+           {% if order.feedback %}
+           <label><b>feedback</b></label>
+           <textarea class="form-control" required name="feedback" cols="5" disabled>{{ order.feedback }}</textarea>
+           {% else %}
+           <form action="{% url 'submit_feedback' order.id %}" method="POST">
+             {% csrf_token %}
+             <textarea class="form-control" required name="feedback" cols="5" placeholder="Write your Feedback.."></textarea>
+             <input type="submit" style="position: relative;
+             right: -350px;
+             border: 3px solid green;" class="btn btn-sm btn-primary pull-right" value="Save">
+           </form>
+           {% endif %}
+           {% endif %}
+           <!-- <p><b>Oder Details</b></p> -->
+
+            <hr/>
+       </div>
+     
+        
+       {% endfor %}
+    
+   </div>
+  </div>
+ </div>
+</div>
+{% endblock main-content %}

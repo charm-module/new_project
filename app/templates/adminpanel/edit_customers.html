@@ -1,0 +1,77 @@
+{% extends "adminpanel/base.html" %}
+{% block custom_css %}
+
+
+
+{% endblock custom_css %}
+{%block content%}
+<section class="content">
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary" style="margin-top: 20px;">
+              <div class="card-header">
+                <h3 class="card-title" >Edit Customer</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form role="form" action="/admin/save_edit_customer" method="POST" >
+                {% csrf_token %}
+                <div class="card-body">
+                  <div class="form-group">
+                    <label>Email address</label>
+                    <input type="email" class="form-control" name="email" value="{{ user.email }}" placeholder="Enter email" required  id="id_email" autocomplete="off" >
+                  </div>
+                  <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" placeholder="First name" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" class="form-control" name="last_name" value="{{ user.last_name}}" placeholder="Last name" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>Locality</label>
+                    <input type="text" class="form-control" name="locality" value="{{ customer.locality}}"  placeholder="Locality" required>
+                  </div>
+                  <div class="form-group">
+                    <input type="hidden" name="customer_id" value="{{ user.id }}" required>
+                  </div>
+
+
+
+                </div>
+                <div class="form-group">
+                    {% if messages %}
+                      {% for message in messages %}
+                      {% if message.tags == 'error' %}
+                      <div class="alert alert-danger" style="margin-top:10px;">{{message}}</div>
+                      {% endif %}
+                      {% if message.tags == 'success' %}
+                      <div class="alert alert-success" style="margin-top:10px;">{{message}}</div>
+                      {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary btn-block">Edit Customer</button>
+                </div>
+              </form>
+            </div>
+            <!-- /.card -->
+
+           
+    </div>
+  </section>
+  {% endblock %}
+  {% block custom_js %}
+
+  
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script> -->
+
+
+  
+{% endblock custom_js %}

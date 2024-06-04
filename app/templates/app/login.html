@@ -1,0 +1,46 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Login{% endblock title %}
+{% block main-content %}
+<div class="container">
+ <div class="row my-3">
+  <div class="col-sm-6 offset-sm-3">
+   <h3>Login</h3>
+   <hr>
+
+ 
+   <form  method="post" novalidate="" class="shadow p-5">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="id_username">Username:</label> <input type="text" name="username" autofocus="" class="form-control" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username"> <small class="text-danger"></small><br>
+    </div>
+    
+    <div class="form-group">
+        <label for="id_password">password:</label> <input type="password" name="password" autocomplete="current-password" class="form-control" required="" id="id_password"> <small class="text-danger"></small><br>
+    </div>
+    
+   <small><a href=" /password-reset/">forget password ?</a></small> <br> 
+   {% for message in messages %}
+    <div class="alert alert-success">
+        <a class="close" href="#" data-dismiss="alert">×</a>
+        {{ message }}
+    </div>
+    {% endfor %}
+    <input type="submit" class="btn btn-primary mt-4" value="Login">
+    <br>
+    
+ 
+   </form>
+
+
+
+
+
+
+
+  
+  </div>
+ </div>
+</div>
+{% endblock main-content %}
